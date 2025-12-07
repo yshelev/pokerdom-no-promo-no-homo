@@ -16,7 +16,7 @@ def decrypt(c: int, k: int, p: int) -> int:
     k_inv = modinv(k, p - 1)
     return pow(c, k_inv, p)
 
-def decrypt_message_with_key_list(message, key_list: list): 
+def decrypt_message_with_key_list(message: int, key_list: list): 
     cur_mess = message
     for key_k, key_p in key_list: 
         cur_mess = decrypt(cur_mess, key_k, key_p)
