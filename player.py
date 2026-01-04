@@ -1,2 +1,14 @@
+from clientSocket import ClientSocket
+from serverSocket import ServerSocket
+
 class Player: 
-    player_deck: list[int]
+    _server_socket: ServerSocket
+    _client_socket: ClientSocket
+    
+    def __init__(
+        self, 
+        player_id, 
+        host, 
+        port
+    ): 
+        self._server_socket = ServerSocket(host, port)
