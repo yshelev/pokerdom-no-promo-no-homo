@@ -1,4 +1,4 @@
-from card_translator_module import CardToTextTranslator
+from .cardTranslatorModule import CardToTextTranslator
 
 class Printer: 
     translator: CardToTextTranslator = CardToTextTranslator()
