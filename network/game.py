@@ -3,7 +3,7 @@ from models.gameMessage import GameMessage
 from models.actionType import ActionType
 from models.GameStates.IState import IState
 from models.GameStates.InitialState import InitialState
-
+from models.GameStates.DealingCardState import DealingCardState
 
 class Game:
     server: Server 
@@ -28,9 +28,6 @@ class Game:
             self.handle_message
         )
         
-    async def handle_message(self, player_id: str, message: ...): 
-        await self._state.handle_message(player_id, message)
-        
     async def start(self, players):
         self.players = players
         
@@ -48,9 +45,28 @@ class Game:
             self.players[0], 
             message
         )  
-        
+    
+            
+    async def handle_message(self, player_id: str, message): 
+        await self._state.handle_message(player_id, message)
+    
     async def send_message_to_player(self, player_id: str, message): 
         await self.server.send_message_to_player(player_id, message)
         
-    def start_dealing_cards(self): 
-        print("start dealing cards")
+    async def start_dealing_cards(self, deck: list[int], players: list[str]): 
+        self._state = DealingCardState(
+            deck, 
+            players, 
+            self
+        )
+        
+        message = GameMessage(
+            deck,
+            ActionType.SHUFFLE, 
+            
+        )
+        
+        await self.send_message_to_player(
+            self.players[-1], 
+            message
+        )

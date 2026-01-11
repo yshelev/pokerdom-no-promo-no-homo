@@ -25,7 +25,10 @@ class InitialState(IState):
         data = message.data
         
         if self.current_player >= len(self.players): 
-            self.game_instance.start_dealing_cards()
+            await self.game_instance.start_dealing_cards(
+                data, 
+                self.players
+            )
             return  
             
         cur_player = self.players[self.current_player]
@@ -38,7 +41,7 @@ class InitialState(IState):
         
         await self.game_instance.send_message_to_player(
             cur_player, 
-            message_to_player
+            message_to_player,
         )
         
         self.current_player += 1

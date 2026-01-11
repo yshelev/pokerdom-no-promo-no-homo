@@ -2,7 +2,7 @@ from services.decoder import Decoder
 from services.encoder import Encoder
 from services.generator import Generator
 import random
-from .utils.printer import Printer
+from .services.printer import Printer
 
 if __name__ == "__main__":
     printer = Printer()
