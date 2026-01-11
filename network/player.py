@@ -14,6 +14,7 @@ class Player:
     deck: list[int]
     
     hand: list[int]
+    table_cards: list[int] = []
     
     _encoder: Encoder = Encoder()
     _decoder: Decoder = Decoder()
@@ -36,9 +37,26 @@ class Player:
         
     async def handle_message(self, message: GameMessage):
         cards = message.data
+        if message.action == ActionType.TAKE_TABLE_CARDS: 
+            self.table_cards += message.data
+            self._printer.print_int_card_deck(self.table_cards)
+        
         if message.action == ActionType.TAKE_YOUR_HAND: 
             self.hand = self._decoder.decrypt_list_messages(message.data, self.secret_key, self.public_key)
             self._printer.print_int_card_deck(self.hand)
+        if message.action == ActionType.GET_THREE_CARD:
+            cards = []
+            for _ in range(3): 
+                c = random.choice(self.deck)
+                self.deck.remove(c)
+                cards.append(c)
+            
+            answer = GameMessage(
+                cards, 
+                ActionType.GET_THREE_CARD
+            )
+            
+            await self.send_message(answer)
             
         if message.action == ActionType.GET_TWO_CARD: 
             output_cards = []

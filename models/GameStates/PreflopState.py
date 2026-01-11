@@ -1,7 +1,7 @@
 from models.gameMessage import GameMessage
 from models.actionType import ActionType
 
-class DealingCardState:
+class PreflopState:
     def __init__(
         self, 
         deck, 
@@ -36,7 +36,7 @@ class DealingCardState:
             self.current_player_index %= self.players_num
             
             if self.index_of_player_to_get_card >= self.players_num: 
-                self.game_instance.put_the_cards_on_the_table()
+                await self.game_instance.to_flop(self.players)
                 return
             
             card_ask_message = GameMessage(

@@ -7,3 +7,4 @@ class ActionType:
     ACKNOWLEDGMENT = "ack"
     SHUFFLE = "shuffle"
     TAKE_YOUR_HAND = "take_your_hand"
+    TAKE_TABLE_CARDS = "take_table_cards"
