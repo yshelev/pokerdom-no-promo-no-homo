@@ -1,16 +1,23 @@
 from network.clientSocket import ClientSocket
 from models.gameMessage import GameMessage
+from models.actionType import ActionType
+from services.encoder import Encoder
+from services.decoder import Decoder
+from services.generator import Generator
 
 class Player: 
     _socket: ClientSocket
     player_id: str
+    
+    _encoder: Encoder = Encoder()
+    _decoder: Decoder = Decoder()
     
     def __init__(
         self,
         player_id: str, 
         host: str, 
         port: int
-    ): 
+    ):         
         self._socket = ClientSocket(
             host, 
             port, 
@@ -20,8 +27,23 @@ class Player:
                 
         self._socket.start(player_id)
         
-    def handle_message(self, message: GameMessage):
-        ... 
+    async def handle_message(self, message: GameMessage):
+        if message.action == ActionType.ENCODE: 
+            cards = message.data
+            
+            encoded_cards = self._encoder.encode_list_of_messages(cards, self.secret_key, self.public_key)
+            
+            my_message = GameMessage(
+                data=encoded_cards, 
+                action=ActionType.ENCODE
+            )
+            
+            await self.send_message(my_message)
+        
+        if message.action == ActionType.ACKNOWLEDGMENT: 
+            self.public_key = message.data[0]
+            
+            self.secret_key = Generator.generate_key(self.public_key)
         
     async def send_message(self, message: GameMessage): 
-        ... 
+        await self._socket.send_message(message)

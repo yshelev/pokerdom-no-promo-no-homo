@@ -1,15 +1,20 @@
 import asyncio
 import pickle
 from models.messageTypes import MessageTypes
-from .ISocket import ISocket
 from typing import Callable
+from models.actionType import ActionType
+from models.gameMessage import GameMessage
+from services.generator import Generator
 
-class ServerSocket(ISocket): 
+class ServerSocket: 
     host: str
     port: int
     
-    readers: dict[str, asyncio.StreamReader]
-    writers: dict[str, asyncio.StreamWriter]
+    readers: dict[str, asyncio.StreamReader] = {}
+    writers: dict[str, asyncio.StreamWriter] = {}
+    
+    public_key: int = Generator.generate_large_prime()
+    
     def __init__(
         self,
         host: str,
@@ -52,18 +57,21 @@ class ServerSocket(ISocket):
         identification = pickle.loads(data) 
         player_id = identification.get('player_id')
         
-        self.on_connection_received_callback(player_id)
-        
         self.readers[player_id] = reader
         self.writers[player_id] = writer
         
-        ack = {
-            'type': MessageTypes.ACKNOWLEDGMENT
-        }
+        ack = GameMessage(
+            [self.public_key],
+            ActionType.ACKNOWLEDGMENT, 
+        )
+
         writer.write(pickle.dumps(ack))
         await writer.drain()
         
         asyncio.create_task(self.receive_from_player(player_id, reader))
+        
+        await self.on_connection_received_callback(player_id)
+        
     
     async def receive_from_player(self, player_id: str, reader: asyncio.StreamReader):
         try:
@@ -77,10 +85,8 @@ class ServerSocket(ISocket):
         finally:
             self.cleanup_connection(player_id)
         
-    async def handle_message(self, from_player: str, message: dict):
-        message["from_player"] = from_player
-                
-        self.callback(message)
+    async def handle_message(self, player_id: str, message: dict):
+        await self.callback(player_id, message)
         
     def cleanup_connection(self, player_id: str):
         if player_id in self.writers:
@@ -92,8 +98,10 @@ class ServerSocket(ISocket):
         if player_id in self.readers:
             del self.readers[player_id]
             
-    async def send_to_player(self, player_id: str, message: dict): 
+    async def send_to_player(self, player_id: str, message): 
         writer = self.writers[player_id]
         data = pickle.dumps(message)
         writer.write(data)
         await writer.drain()
+        
+        

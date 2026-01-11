@@ -1,4 +1,4 @@
-from network.server import Server
+from network.game import Game
 from network.player import Player
 from serverConfig import ServerConfig
 import asyncio
@@ -16,9 +16,15 @@ async def main():
         host = ServerConfig.host
         port = ServerConfig.port
         
-        server = Server(
+        game_instance = Game(
             host, 
             port
+        )
+        player_id = input("Введите ваш username\n")
+        player = Player(
+            player_id, 
+            host, 
+            int(port)
         )
         
         print(

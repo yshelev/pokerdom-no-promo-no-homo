@@ -4,7 +4,7 @@ from math import gcd
 
 class Generator: 
     @staticmethod
-    def generate_large_prime(bits: int = 1024) -> int:
+    def generate_large_prime(bits: int = 32) -> int:
         while True:
             candidate = secrets.randbits(bits)
             candidate |= (1 << (bits - 1)) | 1  
@@ -17,4 +17,4 @@ class Generator:
         while True:
             k = secrets.randbelow(phi - 2) + 2  
             if gcd(k, phi) == 1:
-                return k, p 
+                return k 

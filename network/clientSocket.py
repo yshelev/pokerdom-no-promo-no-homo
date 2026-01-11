@@ -1,10 +1,9 @@
 import asyncio
 import pickle
-from .ISocket import ISocket
 from models.gameMessage import GameMessage
 from typing import Callable
 
-class ClientSocket(ISocket): 
+class ClientSocket: 
     reader: asyncio.StreamReader 
     writer: asyncio.StreamWriter 
     
@@ -33,10 +32,12 @@ class ClientSocket(ISocket):
             while True: 
                 data = await self.reader.read(1024)
                 if not data:
-                    break
+                    continue
                 
                 message = pickle.loads(data)
-                self.callback(message)
+                print(message)
+                
+                await self.callback(message)
         except (ConnectionError, asyncio.CancelledError):
             return
         
