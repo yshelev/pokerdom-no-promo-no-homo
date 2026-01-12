@@ -5,6 +5,8 @@ from models.GameStates.IState import IState
 from models.GameStates.InitialState import InitialState
 from models.GameStates.PreflopState import PreflopState
 from models.GameStates.FlopState import FlopState
+from models.GameStates.RiverState import RiverState
+from models.GameStates.TurnState import TurnState
 
 class Game:
     server: Server 
@@ -71,8 +73,46 @@ class Game:
             self.players[-1], 
             message
         )
+    async def to_end_game(self, players): 
+        ...
+    
+    async def to_turn(self, players):
+        print('123t')
+        self._state = TurnState(
+            players, 
+            self
+        )
+        
+        message = GameMessage(
+            [],
+            ActionType.GET_ONE_CARD, 
+        )
+        
+        await self.send_message_to_player(
+            self.players[-1], 
+            message
+        )
+    async def to_river(self, players: list[str]): 
+        print('12r')
+        
+        self._state = RiverState(
+            players, 
+            self
+        )
+        
+        message = GameMessage(
+            [],
+            ActionType.GET_ONE_CARD, 
+        )
+        
+        await self.send_message_to_player(
+            self.players[-1], 
+            message
+        )
         
     async def to_flop(self, players: list[str]): 
+        print('123f')
+        
         self._state = FlopState(
             players, 
             self

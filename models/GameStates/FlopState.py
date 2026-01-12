@@ -8,7 +8,6 @@ class FlopState(IState):
         players: list[str],
         game_instance
     ):
-        print("on flop")
         self.players = players
         self.game_instance = game_instance
         self.start_pos = 0
@@ -21,12 +20,15 @@ class FlopState(IState):
                 message.data, 
                 ActionType.TAKE_TABLE_CARDS
             )
-            print("123")
+            
             for player in self.players: 
                 await self.game_instance.send_message_to_player(
                     player, 
                     confirm_message
                 )
+            
+            await self.game_instance.to_turn(self.players)
+            
             return
             
         cur_player = self.players[self.current_player]

@@ -57,7 +57,17 @@ class Player:
             )
             
             await self.send_message(answer)
+        if message.action == ActionType.GET_ONE_CARD:
+            c = random.choice(self.deck)
+            self.deck.remove(c)
             
+            answer = GameMessage(
+                [c], 
+                ActionType.GET_ONE_CARD
+            )
+            
+            await self.send_message(answer)
+             
         if message.action == ActionType.GET_TWO_CARD: 
             output_cards = []
             for _ in range(2): 
