@@ -36,7 +36,7 @@ class PreflopState:
             self.current_player_index %= self.players_num
             
             if self.index_of_player_to_get_card >= self.players_num: 
-                await self.game_instance.to_flop(self.players)
+                await self.game_instance.start_preflop_bet_round(self.players)
                 return
             
             card_ask_message = GameMessage(

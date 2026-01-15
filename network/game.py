@@ -7,6 +7,8 @@ from models.GameStates.PreflopState import PreflopState
 from models.GameStates.FlopState import FlopState
 from models.GameStates.RiverState import RiverState
 from models.GameStates.TurnState import TurnState
+from models.GameStates.EndGameState import EndGameState
+from models.GameStates.BetRoundState import BetRoundState
 
 class Game:
     server: Server 
@@ -73,11 +75,52 @@ class Game:
             self.players[-1], 
             message
         )
+    async def start_preflop_bet_round(self, players): 
+        await self.start_bet_round(players, self.to_flop)
+    
+    async def start_flop_bet_round(self, players): 
+        await self.start_bet_round(players, self.to_turn)
+    
+    async def start_turn_bet_round(self, players): 
+        await self.start_bet_round(players, self.to_river)
+    
+    async def start_river_bet_round(self, players): 
+        await self.start_bet_round(players, self.to_end_game)
+        
+    async def start_bet_round(self, players, callback): 
+        self._state = BetRoundState(
+            players, 
+            callback, 
+            self
+        )
+        
+        message = GameMessage(
+            {player: 0 for player in players}, 
+            ActionType.MAKE_BET
+        )
+        
+        await self.send_message_to_player(
+            players[0], 
+            message
+        )
+        
     async def to_end_game(self, players): 
-        ...
+        self._state = EndGameState(
+            players, 
+            self
+        )
+        
+        for player in players: 
+            message = GameMessage(
+                [], 
+                ActionType.GET_BEST_HAND
+            )
+            await self.send_message_to_player(player, message)
+            
+        
+        
     
     async def to_turn(self, players):
-        print('123t')
         self._state = TurnState(
             players, 
             self

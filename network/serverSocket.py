@@ -85,7 +85,8 @@ class ServerSocket:
         finally:
             self.cleanup_connection(player_id)
         
-    async def handle_message(self, player_id: str, message: dict):
+    async def handle_message(self, player_id: str, message: GameMessage):
+        print(message.action)
         await self.callback(player_id, message)
         
     def cleanup_connection(self, player_id: str):

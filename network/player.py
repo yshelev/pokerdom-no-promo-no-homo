@@ -5,7 +5,9 @@ from services.encoder import Encoder
 from services.decoder import Decoder
 from services.generator import Generator
 from services.printer import Printer
+from services.cardCheckService import CardCheckService
 import random
+from aioconsole import ainput
 
 
 class Player: 
@@ -19,6 +21,7 @@ class Player:
     _encoder: Encoder = Encoder()
     _decoder: Decoder = Decoder()
     _printer: Printer = Printer()
+    _deck_checker: CardCheckService = CardCheckService()
     
     def __init__(
         self,
@@ -37,6 +40,76 @@ class Player:
         
     async def handle_message(self, message: GameMessage):
         cards = message.data
+        if message.action == ActionType.MAKE_BET: 
+            print("Ваш ход, делайте ставку!")
+            print("Доступные действия: ")
+            print("1. Показать (мои) карты")
+            print("2. Поднять ставку")
+            print("3. Подвердить ставку")
+            print("4. Сбросить карты")
+            while player_action := int(await ainput("Какое действие вы хотите совершить?\n")):
+                if player_action == 1:
+                    print("Ваша рука:")
+                    self._printer.print_int_card_deck(self.hand)
+                    print("Карты на столе:")
+                    self._printer.print_int_card_deck(self.table_cards) 
+                if player_action == 2: 
+                    while player_bet := await ainput("Введите вашу ставку (вводите полную ставку, включая те фишки, что уже лежат на столе)\n"): 
+                        try:
+                            player_bet = int(player_bet)
+                            if player_bet > max(cards.values()): 
+                                print(f"Ставка принята")
+                                break
+                        except Exception as e: 
+                            pass
+                            
+                        
+                    bet_message = GameMessage(
+                        [player_bet], 
+                        ActionType.RAISE
+                    )
+                        
+                    await self.send_message(bet_message)
+                    break
+                if player_action == 3: 
+                    bet_message = GameMessage(
+                        [], 
+                        ActionType.CALL
+                    )
+                        
+                    await self.send_message(bet_message)
+                    break
+                if player_action == 4: 
+                    bet_message = GameMessage(
+                        [], 
+                        ActionType.FOLD
+                    )
+                        
+                    await self.send_message(bet_message)
+                    break
+            
+            
+            
+        if message.action == ActionType.WINNER: 
+            winner = message.data[0]
+            if winner == self.player_id: 
+                print("Вы победили эту раздачу, поздравляю!")
+            else: 
+                print(f"Вы проиграли, победитель: {winner}")
+        
+        if message.action == ActionType.GET_BEST_HAND: 
+            self.my_combination = self.table_cards + self.hand
+            
+            cards = self._deck_checker.best_poker_hand(self.my_combination)[1]
+            self._printer.print_int_card_deck(cards)
+            
+            answer = GameMessage(
+                cards, 
+                ActionType.GET_BEST_HAND
+            )
+            
+            await self.send_message(answer)
+        
         if message.action == ActionType.TAKE_TABLE_CARDS: 
             self.table_cards += message.data
             self._printer.print_int_card_deck(self.table_cards)

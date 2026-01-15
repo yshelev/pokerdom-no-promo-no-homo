@@ -1,10 +1,16 @@
 class ActionType: 
     ENCODE = 'encode'
     DECODE = 'decode'
-    GET_ONE_CARD = 'get_one_card'
-    GET_TWO_CARD = 'get_two_card'
-    GET_THREE_CARD = 'get_three_card'
+    GET_ONE_CARD = 'get one card'
+    GET_TWO_CARD = 'get two card'
+    GET_THREE_CARD = 'get three card'
+    GET_BEST_HAND = 'get best hand'
     ACKNOWLEDGMENT = "ack"
     SHUFFLE = "shuffle"
-    TAKE_YOUR_HAND = "take_your_hand"
-    TAKE_TABLE_CARDS = "take_table_cards"
+    TAKE_YOUR_HAND = "take your hand"
+    TAKE_TABLE_CARDS = "take table cards"
+    WINNER = "winner"
+    RAISE = "raise"
+    FOLD = "fold"
+    CALL = "call"
+    MAKE_BET = "make bet"

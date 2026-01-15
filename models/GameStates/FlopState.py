@@ -27,7 +27,7 @@ class FlopState(IState):
                     confirm_message
                 )
             
-            await self.game_instance.to_turn(self.players)
+            await self.game_instance.start_flop_bet_round(self.players)
             
             return
             

@@ -20,20 +20,19 @@ async def main():
             host, 
             port
         )
-        player_id = input("Введите ваш username\n")
-        player = Player(
-            player_id, 
-            host, 
-            int(port)
-        )
-        
+
         print(
 f"""
 host: {host}
 port: {port}
 """
         )
-        
+        # player_id = input("Введите ваш username\n")
+        # player = Player(
+        #     player_id, 
+        #     host, 
+        #     int(port) # тут проблема в том, что нужно менять EndGameState.py для того, чтобы все соо по очереди приходили
+        # )
     if ans == "2": 
         player_id = input("Введите ваш username\n")
         
