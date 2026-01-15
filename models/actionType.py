@@ -14,3 +14,6 @@ class ActionType:
     FOLD = "fold"
     CALL = "call"
     MAKE_BET = "make bet"
+    IS_READY = "ready"
+    NOT_READY = "not ready"
+    ARE_YOU_READY = "are you ready"

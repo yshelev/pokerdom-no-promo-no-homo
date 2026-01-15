@@ -7,7 +7,6 @@ class InitialState(IState):
         players: list[str],
         game_instance
     ):
-        print("initial state")
         
         super().__init__()
         
@@ -20,8 +19,7 @@ class InitialState(IState):
         
         print(self.players)
     
-    async def handle_message(self, player_id: str, message: GameMessage): 
-        print("handling message")
+    async def _handle_message(self, player_id: str, message: GameMessage): 
         data = message.data
         
         if self.current_player >= len(self.players): 

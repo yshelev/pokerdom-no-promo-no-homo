@@ -12,15 +12,13 @@ class EndGameState(IState):
         players: list[str],
         game_instance 
     ):
-        print("WHERE AM I")
         self.players = players
         self.game_instance = game_instance
         
         self.all_combinations = {}
         
-    async def handle_message(self, player_id: str, message: GameMessage):
+    async def _handle_message(self, player_id: str, message: GameMessage):
         self.all_combinations[player_id] = message.data
-        print(self.all_combinations, self.players)
         if len(self.all_combinations) == len(self.players): 
             await self.get_best_hand()
             

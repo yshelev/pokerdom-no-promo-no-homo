@@ -47,14 +47,14 @@ class Player:
             print("2. Поднять ставку")
             print("3. Подвердить ставку")
             print("4. Сбросить карты")
-            while player_action := int(await ainput("Какое действие вы хотите совершить?\n")):
+            while player_action := int(input("Какое действие вы хотите совершить?\n")):
                 if player_action == 1:
                     print("Ваша рука:")
                     self._printer.print_int_card_deck(self.hand)
                     print("Карты на столе:")
                     self._printer.print_int_card_deck(self.table_cards) 
                 if player_action == 2: 
-                    while player_bet := await ainput("Введите вашу ставку (вводите полную ставку, включая те фишки, что уже лежат на столе)\n"): 
+                    while player_bet := input("Введите вашу ставку (вводите полную ставку, включая те фишки, что уже лежат на столе)\n"): 
                         try:
                             player_bet = int(player_bet)
                             if player_bet > max(cards.values()): 
@@ -88,7 +88,21 @@ class Player:
                     await self.send_message(bet_message)
                     break
             
+        if message.action == ActionType.ARE_YOU_READY: 
+            print("Хост предлагает сыграть следующую раздачу. вы в игре?")
+            while ans := input("Введите ваш ответ, да\нет") not in ["да", "нет"]:
+                pass
             
+            answer = GameMessage(
+                [], 
+                ""
+            )
+            if ans == "да": 
+                answer.action = ActionType.IS_READY
+            if ans == "нет": 
+                answer.action = ActionType.NOT_READY
+            
+            await self.send_message(answer)
             
         if message.action == ActionType.WINNER: 
             winner = message.data[0]

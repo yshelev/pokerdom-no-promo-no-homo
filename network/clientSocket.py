@@ -35,7 +35,6 @@ class ClientSocket:
                     continue
                 
                 message = pickle.loads(data)
-                print(message)
                 
                 await self.callback(message)
         except (ConnectionError, asyncio.CancelledError):

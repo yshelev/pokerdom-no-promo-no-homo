@@ -1,7 +1,8 @@
 from models.gameMessage import GameMessage
 from models.actionType import ActionType
+from models.GameStates.IState import IState
 
-class PreflopState:
+class PreflopState(IState):
     def __init__(
         self, 
         deck, 
@@ -17,7 +18,7 @@ class PreflopState:
         self.index_of_player_to_get_card = -1
         self.current_player_index = -1
         
-    async def handle_message(self, player_id: str, message: GameMessage): 
+    async def _handle_message(self, player_id: str, message: GameMessage): 
         if self.current_player_index == self.index_of_player_to_get_card:
             if self.current_player_index != -1: 
                 take_hand_message = GameMessage(

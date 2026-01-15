@@ -14,7 +14,7 @@ class RiverState(IState):
         self.current_player = self.start_pos
         self.flag = False
         
-    async def handle_message(self, player_id, message: GameMessage):
+    async def _handle_message(self, player_id, message: GameMessage):
         if self.current_player == self.start_pos and self.flag: 
             confirm_message = GameMessage(
                 message.data, 

@@ -9,9 +9,10 @@ from models.GameStates.RiverState import RiverState
 from models.GameStates.TurnState import TurnState
 from models.GameStates.EndGameState import EndGameState
 from models.GameStates.BetRoundState import BetRoundState
+from models.GameStates.PostGameState import PostGameState
 
 class Game:
-    server: Server 
+    _server: Server 
     players: list[str] = []
     cards: list[int] = [
         i * 10 + j 
@@ -26,7 +27,7 @@ class Game:
         host, 
         port
     ): 
-        self.server = Server(
+        self._server = Server(
             host, 
             port, 
             self.start, 
@@ -37,7 +38,7 @@ class Game:
         self.players = players
         
         self._state = InitialState(
-            self.players, 
+            self.players.copy(), 
             self
         )
         
@@ -46,17 +47,16 @@ class Game:
             action=ActionType.ENCODE
         )
         
-        await self.server.send_message_to_player(
+        await self._server.send_message_to_player(
             self.players[0], 
             message
         )  
-    
             
     async def handle_message(self, player_id: str, message): 
         await self._state.handle_message(player_id, message)
     
     async def send_message_to_player(self, player_id: str, message): 
-        await self.server.send_message_to_player(player_id, message)
+        await self._server.send_message_to_player(player_id, message)
         
     async def start_dealing_cards(self, deck: list[int], players: list[str]): 
         self._state = PreflopState(
@@ -117,9 +117,22 @@ class Game:
             )
             await self.send_message_to_player(player, message)
             
+    async def to_post_game(self): 
+        self._state = PostGameState(
+            self.players, 
+            self
+        )    
         
+        message = GameMessage(
+            [], 
+            ActionType.ARE_YOU_READY
+        )
+
+        await self.send_message_to_player(
+            self.players[0], 
+            message
+        )
         
-    
     async def to_turn(self, players):
         self._state = TurnState(
             players, 
@@ -136,8 +149,6 @@ class Game:
             message
         )
     async def to_river(self, players: list[str]): 
-        print('12r')
-        
         self._state = RiverState(
             players, 
             self
@@ -154,8 +165,6 @@ class Game:
         )
         
     async def to_flop(self, players: list[str]): 
-        print('123f')
-        
         self._state = FlopState(
             players, 
             self
@@ -170,3 +179,6 @@ class Game:
             self.players[-1], 
             message
         )
+        
+    async def remove_disconnected_players(self, disconnected):
+        await self._server.remove_disconnected_players(disconnected)

@@ -1,7 +1,7 @@
 from models.gameMessage import GameMessage
 from models.actionType import ActionType
-
-class BetRoundState: 
+from models.GameStates.IState import IState
+class BetRoundState(IState): 
     players: list[str]
     
     bets: dict
@@ -20,7 +20,7 @@ class BetRoundState:
         
         self.current_player_idx = 0
         
-    async def handle_message(self, player_id: str, message: GameMessage): 
+    async def _handle_message(self, player_id: str, message: GameMessage): 
         if message.action == ActionType.FOLD: 
             self.players.remove(player_id)
             _ = self.bets.pop(player_id, None)
@@ -51,7 +51,4 @@ class BetRoundState:
         player = self.players[self.current_player_idx]
         
         await self.game_instance.send_message_to_player(player, message)
-        
-        
-
-            
+    
