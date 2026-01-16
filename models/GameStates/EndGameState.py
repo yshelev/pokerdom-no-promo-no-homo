@@ -36,4 +36,4 @@ class EndGameState(IState):
                 final_message
             )
             
-            # gg)) 
+        await self.game_instance.to_post_game()

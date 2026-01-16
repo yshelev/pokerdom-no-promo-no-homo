@@ -43,6 +43,8 @@ class Server:
     async def remove_disconnected_players(self, disconnected): 
         for player in disconnected: 
             self.connected_players.remove(player)
-            
+        
+        print(len(self.connected_players), disconnected)
+        
         if len(self.connected_players) == self._num_of_player_to_start: 
             await self.on_ready_callback(self.connected_players)

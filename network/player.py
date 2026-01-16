@@ -8,6 +8,7 @@ from services.printer import Printer
 from services.cardCheckService import CardCheckService
 import random
 from aioconsole import ainput
+import asyncio
 
 
 class Player: 
@@ -22,6 +23,7 @@ class Player:
     _decoder: Decoder = Decoder()
     _printer: Printer = Printer()
     _deck_checker: CardCheckService = CardCheckService()
+    _lock = asyncio.Lock()
     
     def __init__(
         self,
@@ -37,8 +39,12 @@ class Player:
         self.player_id = player_id
                 
         self._socket.start(player_id)
-        
-    async def handle_message(self, message: GameMessage):
+    
+    async def handle_message(self, message: GameMessage): 
+        async with self._lock: 
+            await self._handle_message(message)
+    
+    async def _handle_message(self, message: GameMessage):
         cards = message.data
         if message.action == ActionType.MAKE_BET: 
             print("Ваш ход, делайте ставку!")
@@ -47,14 +53,14 @@ class Player:
             print("2. Поднять ставку")
             print("3. Подвердить ставку")
             print("4. Сбросить карты")
-            while player_action := int(input("Какое действие вы хотите совершить?\n")):
+            while player_action := int(await ainput("Какое действие вы хотите совершить?\n")):
                 if player_action == 1:
                     print("Ваша рука:")
                     self._printer.print_int_card_deck(self.hand)
                     print("Карты на столе:")
                     self._printer.print_int_card_deck(self.table_cards) 
                 if player_action == 2: 
-                    while player_bet := input("Введите вашу ставку (вводите полную ставку, включая те фишки, что уже лежат на столе)\n"): 
+                    while player_bet := await ainput("Введите вашу ставку (вводите полную ставку, включая те фишки, что уже лежат на столе)\n"): 
                         try:
                             player_bet = int(player_bet)
                             if player_bet > max(cards.values()): 
@@ -90,16 +96,17 @@ class Player:
             
         if message.action == ActionType.ARE_YOU_READY: 
             print("Хост предлагает сыграть следующую раздачу. вы в игре?")
-            while ans := input("Введите ваш ответ, да\нет") not in ["да", "нет"]:
+            while (ans := await ainput("Введите ваш ответ, да\нет\n")) not in ["да", "нет"]:
                 pass
             
             answer = GameMessage(
                 [], 
                 ""
             )
+            
             if ans == "да": 
                 answer.action = ActionType.IS_READY
-            if ans == "нет": 
+            else: 
                 answer.action = ActionType.NOT_READY
             
             await self.send_message(answer)

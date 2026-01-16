@@ -75,16 +75,20 @@ class Game:
             self.players[-1], 
             message
         )
-    async def start_preflop_bet_round(self, players): 
+    async def start_preflop_bet_round(self, players):
+        print("start preflop bet round") 
         await self.start_bet_round(players, self.to_flop)
     
-    async def start_flop_bet_round(self, players): 
+    async def start_flop_bet_round(self, players):
+        print("start flop bet round") 
         await self.start_bet_round(players, self.to_turn)
     
-    async def start_turn_bet_round(self, players): 
+    async def start_turn_bet_round(self, players):
+        print("start turn bet round") 
         await self.start_bet_round(players, self.to_river)
     
-    async def start_river_bet_round(self, players): 
+    async def start_river_bet_round(self, players):
+        print("start river bet round") 
         await self.start_bet_round(players, self.to_end_game)
         
     async def start_bet_round(self, players, callback): 
@@ -181,4 +185,5 @@ class Game:
         )
         
     async def remove_disconnected_players(self, disconnected):
+        print("removing")
         await self._server.remove_disconnected_players(disconnected)
