@@ -51,7 +51,6 @@ class PreflopState(IState):
             )
             return
 
-        print(len(self.players), self.current_player_index, self.index_of_player_to_get_card, self.players_num)
         player_id_to_send = self.players[self.current_player_index]
         
         decode_message = GameMessage(

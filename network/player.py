@@ -45,15 +45,31 @@ class Player:
             await self._handle_message(message)
     
     async def _handle_message(self, message: GameMessage):
+        await asyncio.sleep(.3)
         cards = message.data
         if message.action == ActionType.MAKE_BET: 
+            bets = message.data
+            
             print("Ваш ход, делайте ставку!")
+            print()
+            for username, bet in bets.items(): 
+                print(f"Ставка игрока {username} - {bet}")
+            print()
             print("Доступные действия: ")
             print("1. Показать (мои) карты")
             print("2. Поднять ставку")
             print("3. Подвердить ставку")
             print("4. Сбросить карты")
-            while player_action := int(await ainput("Какое действие вы хотите совершить?\n")):
+            while player_action := await ainput("Какое действие вы хотите совершить?\n"):
+                try: 
+                    player_action = int(player_action)
+                except Exception as e:
+                    print("Введите число от 1 до 4") 
+                    continue
+                if player_action not in range(1, 5): 
+                    print("Введите число от 1 до 4") 
+                    continue
+                
                 if player_action == 1:
                     print("Ваша рука:")
                     self._printer.print_int_card_deck(self.hand)
@@ -63,9 +79,11 @@ class Player:
                     while player_bet := await ainput("Введите вашу ставку (вводите полную ставку, включая те фишки, что уже лежат на столе)\n"): 
                         try:
                             player_bet = int(player_bet)
-                            if player_bet > max(cards.values()): 
+                            if player_bet > max(bets.values()): 
                                 print(f"Ставка принята")
                                 break
+                            else: 
+                                print("Введите ставку, превыщающую максимальную ставку за столом")
                         except Exception as e: 
                             pass
                             
@@ -93,6 +111,8 @@ class Player:
                         
                     await self.send_message(bet_message)
                     break
+                
+                
             
         if message.action == ActionType.ARE_YOU_READY: 
             print("Хост предлагает сыграть следующую раздачу. вы в игре?")
