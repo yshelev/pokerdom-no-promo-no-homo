@@ -27,7 +27,7 @@ class TurnState(IState):
                     confirm_message
                 )
                 
-            await self.game_instance.start_turn_bet_round(self.players)
+            await self.game_instance.start_turn_bet_round()
             return
             
         cur_player = self.players[self.current_player]

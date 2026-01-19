@@ -9,8 +9,6 @@ class PostGameState(IState):
         players, 
         game_instance
     ):
-        print("post game state rn")
-
         self.game_instance = game_instance
         self.players = players
         self.disconnected = []
@@ -18,14 +16,11 @@ class PostGameState(IState):
         self.cur_idx = 0
         
     async def _handle_message(self, player_id, message: GameMessage):
-        print(self.cur_idx)
         if message.action != ActionType.IS_READY:
-            print(message.action)
             self.disconnected.append(player_id)
             
         self.cur_idx += 1
         if self.cur_idx == len(self.players): 
-            print("removin_ ")
             await self.game_instance.remove_disconnected_players(self.disconnected)
             return
             

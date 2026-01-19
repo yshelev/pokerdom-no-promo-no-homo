@@ -15,7 +15,7 @@ class Server:
     ):  
         self._handle_message_callback = handle_message_callback
         
-        self._num_of_player_to_start = 2
+        self._num_of_player_to_start = 3
         
         self.on_ready_callback = on_ready
         self._socket = ServerSocket(

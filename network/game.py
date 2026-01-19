@@ -14,6 +14,7 @@ from models.GameStates.PostGameState import PostGameState
 class Game:
     _server: Server 
     players: list[str] = []
+    players_in_game: list[str] = []
     cards: list[int] = [
         i * 10 + j 
         for i in range(2, 15)
@@ -34,9 +35,16 @@ class Game:
             self.handle_message
         )
         
+        self.bank = 0
+        
+    def get_and_reset_bank(self): 
+        b = self.bank
+        self.bank = 0
+        return b
+        
     async def start(self, players):
         self.players = players
-        
+        self.players_in_game = players
         self._state = InitialState(
             self.players.copy(), 
             self
@@ -61,35 +69,34 @@ class Game:
     async def start_dealing_cards(self, deck: list[int], players: list[str]): 
         self._state = PreflopState(
             deck, 
-            players, 
+            self.players, 
             self
         )
         
         message = GameMessage(
             deck,
             ActionType.SHUFFLE, 
-            
         )
         
         await self.send_message_to_player(
             self.players[-1], 
             message
         )
-    async def start_preflop_bet_round(self, players):
+    async def start_preflop_bet_round(self):
         print("start preflop bet round") 
-        await self.start_bet_round(players, self.to_flop)
+        await self.start_bet_round(self.players_in_game, self.to_flop)
     
-    async def start_flop_bet_round(self, players):
+    async def start_flop_bet_round(self):
         print("start flop bet round") 
-        await self.start_bet_round(players, self.to_turn)
+        await self.start_bet_round(self.players_in_game, self.to_turn)
     
-    async def start_turn_bet_round(self, players):
+    async def start_turn_bet_round(self):
         print("start turn bet round") 
-        await self.start_bet_round(players, self.to_river)
+        await self.start_bet_round(self.players_in_game, self.to_river)
     
-    async def start_river_bet_round(self, players):
+    async def start_river_bet_round(self):
         print("start river bet round") 
-        await self.start_bet_round(players, self.to_end_game)
+        await self.start_bet_round(self.players_in_game, self.to_end_game)
         
     async def start_bet_round(self, players, callback): 
         self._state = BetRoundState(
@@ -108,13 +115,14 @@ class Game:
             message
         )
         
-    async def to_end_game(self, players): 
+    async def to_end_game(self, players, bank: int): 
+        self.bank += bank
         self._state = EndGameState(
-            players, 
+            self.players, 
             self
         )
         
-        for player in players: 
+        for player in self.players: 
             message = GameMessage(
                 [], 
                 ActionType.GET_BEST_HAND
@@ -137,9 +145,10 @@ class Game:
             message
         )
         
-    async def to_turn(self, players):
+    async def to_turn(self, players, bank: int):
+        self.bank += bank
         self._state = TurnState(
-            players, 
+            self.players, 
             self
         )
         
@@ -152,9 +161,11 @@ class Game:
             self.players[-1], 
             message
         )
-    async def to_river(self, players: list[str]): 
+    async def to_river(self, players: list[str], bank: int): 
+        self.bank += bank
+        
         self._state = RiverState(
-            players, 
+            self.players, 
             self
         )
         
@@ -168,9 +179,11 @@ class Game:
             message
         )
         
-    async def to_flop(self, players: list[str]): 
+    async def to_flop(self, players: list[str], bank: int): 
+        self.bank += bank
+
         self._state = FlopState(
-            players, 
+            self.players, 
             self
         )
         
@@ -185,5 +198,4 @@ class Game:
         )
         
     async def remove_disconnected_players(self, disconnected):
-        print("removing")
         await self._server.remove_disconnected_players(disconnected)

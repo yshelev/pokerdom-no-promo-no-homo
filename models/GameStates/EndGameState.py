@@ -26,7 +26,7 @@ class EndGameState(IState):
         player_index = self._best_hand_finder.find_best_hand_index(self.all_combinations)
         
         final_message = GameMessage(
-            [player_index], 
+            [player_index, self.game_instance.get_and_reset_bank()], 
             ActionType.WINNER
         )
         

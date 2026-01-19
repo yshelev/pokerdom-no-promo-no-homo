@@ -36,6 +36,9 @@ port: {port}
     if ans == "2": 
         player_id = input("Введите ваш username\n")
         
+        # host = input("Введите IP хоста: \n")
+        # port = input("Введите port хоста: \n")
+        
         host = ServerConfig.host
         port = ServerConfig.port
         

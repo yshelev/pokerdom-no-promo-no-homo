@@ -27,7 +27,7 @@ class RiverState(IState):
                     confirm_message
                 )
                 
-            await self.game_instance.start_river_bet_round(self.players)    
+            await self.game_instance.start_river_bet_round()    
 
             return
             
